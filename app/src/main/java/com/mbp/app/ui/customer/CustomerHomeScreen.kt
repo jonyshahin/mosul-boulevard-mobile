@@ -101,19 +101,19 @@ fun CustomerHomeScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (villas.isNotEmpty()) {
-                item {
+                item(key = "header_villas") {
                     SectionHeader("Your Villas", MBPGold)
                 }
-                items(villas, key = { it.id }) { v ->
+                items(villas, key = { "villa_${it.id}" }) { v ->
                     VillaCard(v) { onOpenVilla(v.id) }
                 }
             }
             if (units.isNotEmpty()) {
-                item {
+                item(key = "header_units") {
                     Spacer(Modifier.height(8.dp))
                     SectionHeader("Your Apartments", MBPBlue)
                 }
-                items(units, key = { it.id }) { u ->
+                items(units, key = { "unit_${it.id}" }) { u ->
                     TowerUnitCard(u) { onOpenTowerUnit(u.id) }
                 }
             }

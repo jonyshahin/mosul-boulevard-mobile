@@ -195,17 +195,17 @@ fun StakeholderCustomerDetailScreen(
                     val villas = c.villas.orEmpty()
                     val units = c.towerUnits.orEmpty()
                     if (villas.isNotEmpty()) {
-                        item {
+                        item(key = "header_villas") {
                             Text("Villas", color = MBPGold, fontWeight = FontWeight.SemiBold)
                         }
-                        items(villas, key = { it.id }) { v -> VillaRow(v) { onOpenVilla(v.id) } }
+                        items(villas, key = { "villa_${it.id}" }) { v -> VillaRow(v) { onOpenVilla(v.id) } }
                     }
                     if (units.isNotEmpty()) {
-                        item {
+                        item(key = "header_units") {
                             Spacer(Modifier.height(4.dp))
                             Text("Tower Units", color = MBPGold, fontWeight = FontWeight.SemiBold)
                         }
-                        items(units, key = { it.id }) { u -> TowerRow(u) { onOpenUnit(u.id) } }
+                        items(units, key = { "unit_${it.id}" }) { u -> TowerRow(u) { onOpenUnit(u.id) } }
                     }
                     if (villas.isEmpty() && units.isEmpty()) {
                         item { Text("No linked units", color = MBPGray) }
