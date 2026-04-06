@@ -3,14 +3,17 @@ package com.mbp.app.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.mbp.app.ui.splash.SplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,7 +29,6 @@ import com.mbp.app.ui.customer.SiteUpdatesScreen
 import com.mbp.app.ui.customer.UnitDetailScreen
 import com.mbp.app.ui.stakeholder.StakeholderScaffold
 import com.mbp.app.ui.theme.MBPDark
-import com.mbp.app.ui.theme.MBPGold
 
 object Routes {
     const val ROLE_SELECTION = "role_selection"
@@ -46,15 +48,9 @@ fun AppNavigation() {
     val authViewModel: AuthViewModel = hiltViewModel()
     val state by authViewModel.state.collectAsState()
 
-    if (state.initializing) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(MBPDark),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = MBPGold)
-        }
+    var splashDone by remember { mutableStateOf(false) }
+    if (!splashDone || state.initializing) {
+        SplashScreen(onTimeout = { splashDone = true })
         return
     }
 
