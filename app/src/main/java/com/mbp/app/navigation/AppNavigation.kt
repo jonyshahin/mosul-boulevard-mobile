@@ -24,6 +24,7 @@ import com.mbp.app.ui.auth.StakeholderLoginScreen
 import com.mbp.app.ui.customer.CustomerHomeScreen
 import com.mbp.app.ui.customer.SiteUpdatesScreen
 import com.mbp.app.ui.customer.UnitDetailScreen
+import com.mbp.app.ui.stakeholder.StakeholderScaffold
 import com.mbp.app.ui.theme.MBPDark
 import com.mbp.app.ui.theme.MBPGold
 
@@ -138,7 +139,15 @@ fun AppNavigation() {
                 onBack = { navController.popBackStack() }
             )
         }
-        composable(Routes.STAKEHOLDER_DASHBOARD) { ComingSoon("Stakeholder Dashboard") }
+        composable(Routes.STAKEHOLDER_DASHBOARD) {
+            StakeholderScaffold(
+                onLoggedOut = {
+                    navController.navigate(Routes.ROLE_SELECTION) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
 
