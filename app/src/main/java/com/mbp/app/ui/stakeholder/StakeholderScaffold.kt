@@ -1,8 +1,10 @@
 package com.mbp.app.ui.stakeholder
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apartment
 import androidx.compose.material.icons.filled.BarChart
@@ -66,6 +68,7 @@ fun StakeholderScaffold(onLoggedOut: () -> Unit) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MBPDark,
+        contentWindowInsets = WindowInsets.systemBars,
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(containerColor = MBPSurface) {
