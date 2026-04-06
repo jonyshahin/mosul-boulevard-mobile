@@ -13,7 +13,8 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepository @Inject constructor(
     private val apiService: ApiService,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val customerRepository: CustomerRepository,
 ) {
     suspend fun loginWithEmail(email: String, password: String): Result<LoginResponse> = try {
         val resp = apiService.login(LoginRequest(email, password))
@@ -29,6 +30,7 @@ class AuthRepository @Inject constructor(
         tokenManager.saveToken(resp.token)
         tokenManager.saveUserRole("customer")
         tokenManager.saveCustomerId(resp.customer.id)
+        customerRepository.setCachedCustomer(resp.customer)
         Result.success(resp)
     } catch (e: Exception) {
         Result.failure(Exception(extractError(e), e))
@@ -36,6 +38,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun logout() {
         runCatching { apiService.logout() }
+        customerRepository.setCachedCustomer(null)
         tokenManager.clearToken()
     }
 

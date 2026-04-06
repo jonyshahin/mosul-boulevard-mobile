@@ -65,6 +65,11 @@ data class VillaDto(
     @Json(name = "structural_status") val structuralStatus: StatusDto?,
     @Json(name = "finishing_status") val finishingStatus: StatusDto?,
     @Json(name = "facade_status") val facadeStatus: StatusDto?,
+    @Json(name = "planned_start_date") val plannedStartDate: String? = null,
+    @Json(name = "planned_finish_date") val plannedFinishDate: String? = null,
+    @Json(name = "actual_start_date") val actualStartDate: String? = null,
+    @Json(name = "actual_finish_date") val actualFinishDate: String? = null,
+    @Json(name = "site_updates") val siteUpdates: List<SiteUpdateDto>? = null,
     val customer: CustomerDto?
 )
 
@@ -84,7 +89,26 @@ data class TowerUnitDto(
     @Json(name = "finishing_status") val finishingStatus: StatusDto?,
     @Json(name = "facade_status") val facadeStatus: StatusDto?,
     val remarks: String?,
+    @Json(name = "planned_start_date") val plannedStartDate: String? = null,
+    @Json(name = "planned_finish_date") val plannedFinishDate: String? = null,
+    @Json(name = "actual_start_date") val actualStartDate: String? = null,
+    @Json(name = "actual_finish_date") val actualFinishDate: String? = null,
+    @Json(name = "site_updates") val siteUpdates: List<SiteUpdateDto>? = null,
     val customer: CustomerDto?
+)
+
+@JsonClass(generateAdapter = true)
+data class SiteUpdateDto(
+    val id: Int,
+    val date: String?,
+    val notes: String?,
+    val photos: List<SitePhotoDto>? = null,
+)
+
+@JsonClass(generateAdapter = true)
+data class SitePhotoDto(
+    val id: Int,
+    val url: String?,
 )
 
 @JsonClass(generateAdapter = true)

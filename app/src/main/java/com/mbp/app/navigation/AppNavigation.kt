@@ -15,10 +15,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.mbp.app.ui.auth.AuthViewModel
 import com.mbp.app.ui.auth.PhoneLoginScreen
 import com.mbp.app.ui.auth.RoleSelectionScreen
 import com.mbp.app.ui.auth.StakeholderLoginScreen
+import com.mbp.app.ui.customer.CustomerHomeScreen
+import com.mbp.app.ui.customer.SiteUpdatesScreen
+import com.mbp.app.ui.customer.UnitDetailScreen
 import com.mbp.app.ui.theme.MBPDark
 import com.mbp.app.ui.theme.MBPGold
 
@@ -28,6 +33,10 @@ object Routes {
     const val STAKEHOLDER_LOGIN = "stakeholder_login"
     const val CUSTOMER_HOME = "customer_home"
     const val STAKEHOLDER_DASHBOARD = "stakeholder_dashboard"
+    const val UNIT_DETAIL = "unit_detail/{unitId}/{unitType}"
+    const val SITE_UPDATES = "site_updates/{unitId}/{unitType}"
+    fun unitDetail(id: Int, type: String) = "unit_detail/$id/$type"
+    fun siteUpdates(id: Int, type: String) = "site_updates/$id/$type"
 }
 
 @Composable
@@ -81,7 +90,54 @@ fun AppNavigation() {
                 }
             )
         }
-        composable(Routes.CUSTOMER_HOME) { ComingSoon("Customer Home") }
+        composable(Routes.CUSTOMER_HOME) {
+            CustomerHomeScreen(
+                onOpenVilla = { id ->
+                    navController.navigate(Routes.unitDetail(id, "villa"))
+                },
+                onOpenTowerUnit = { id ->
+                    navController.navigate(Routes.unitDetail(id, "tower"))
+                },
+                onLoggedOut = {
+                    navController.navigate(Routes.ROLE_SELECTION) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(
+            Routes.UNIT_DETAIL,
+            arguments = listOf(
+                navArgument("unitId") { type = NavType.IntType },
+                navArgument("unitType") { type = NavType.StringType },
+            )
+        ) { entry ->
+            val id = entry.arguments?.getInt("unitId") ?: 0
+            val type = entry.arguments?.getString("unitType") ?: "villa"
+            UnitDetailScreen(
+                unitId = id,
+                unitType = type,
+                onBack = { navController.popBackStack() },
+                onOpenSiteUpdates = { uid, ut ->
+                    navController.navigate(Routes.siteUpdates(uid, ut))
+                }
+            )
+        }
+        composable(
+            Routes.SITE_UPDATES,
+            arguments = listOf(
+                navArgument("unitId") { type = NavType.IntType },
+                navArgument("unitType") { type = NavType.StringType },
+            )
+        ) { entry ->
+            val id = entry.arguments?.getInt("unitId") ?: 0
+            val type = entry.arguments?.getString("unitType") ?: "villa"
+            SiteUpdatesScreen(
+                unitId = id,
+                unitType = type,
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(Routes.STAKEHOLDER_DASHBOARD) { ComingSoon("Stakeholder Dashboard") }
     }
 }
