@@ -35,10 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mbp.app.data.model.SalesGroup
-import com.mbp.app.data.model.StatusBucket
+import com.mbp.app.data.model.SalesSummaryResponse
 import com.mbp.app.data.model.StatusReportResponse
-import com.mbp.app.ui.customer.parseColor
+import com.mbp.app.data.model.TowerSalesRow
+import com.mbp.app.data.model.TowerStatusRow
+import com.mbp.app.data.model.VillaSalesRow
+import com.mbp.app.data.model.VillaStatusRow
 import com.mbp.app.ui.theme.MBPDark
 import com.mbp.app.ui.theme.MBPError
 import com.mbp.app.ui.theme.MBPGold
@@ -86,7 +88,7 @@ fun ReportsScreen(viewModel: ReportsViewModel = hiltViewModel()) {
                 Text(state.error ?: "", color = MBPError)
             }
             else -> when (selected) {
-                0 -> SalesContent(state.sales?.villas, state.sales?.towerUnits)
+                0 -> SalesContent(state.sales)
                 1 -> StatusContent(state.structural)
                 2 -> StatusContent(state.finishing)
                 3 -> StatusContent(state.facade)
@@ -96,23 +98,64 @@ fun ReportsScreen(viewModel: ReportsViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun SalesContent(villas: SalesGroup?, units: SalesGroup?) {
+private fun SalesContent(sales: SalesSummaryResponse?) {
+    if (sales == null) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No data", color = MBPGray)
+        }
+        return
+    }
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (villas != null) item { SalesCard("Villas", villas) }
-        if (units != null) item { SalesCard("Tower Units", units) }
-        if (villas == null && units == null) {
+        if (sales.villas.isNotEmpty()) {
+            item(key = "h_villas") {
+                Text("Villas", color = Color.White, fontWeight = FontWeight.SemiBold)
+            }
+            items(sales.villas, key = { "vs_${it.villaTypeId ?: it.villaTypeName}" }) {
+                VillaSalesCard(it)
+            }
+        }
+        if (sales.towers.isNotEmpty()) {
+            item(key = "h_towers") {
+                Spacer(Modifier.height(4.dp))
+                Text("Towers", color = Color.White, fontWeight = FontWeight.SemiBold)
+            }
+            items(sales.towers, key = { "ts_${it.towerDefinitionId ?: it.towerName}" }) {
+                TowerSalesCard(it)
+            }
+        }
+        if (sales.villas.isEmpty() && sales.towers.isEmpty()) {
             item { Text("No data", color = MBPGray) }
         }
     }
 }
 
 @Composable
-private fun SalesCard(label: String, group: SalesGroup) {
-    val pct = if (group.total > 0) group.sold.toFloat() / group.total else 0f
+private fun VillaSalesCard(row: VillaSalesRow) {
+    SalesRowCard(
+        label = row.villaTypeName ?: "Villa",
+        sold = row.totalSold,
+        unsold = row.totalUnsold,
+        total = row.total
+    )
+}
+
+@Composable
+private fun TowerSalesCard(row: TowerSalesRow) {
+    SalesRowCard(
+        label = row.towerName ?: "Tower",
+        sold = row.totalSold,
+        unsold = row.totalUnsold,
+        total = row.total
+    )
+}
+
+@Composable
+private fun SalesRowCard(label: String, sold: Int, unsold: Int, total: Int) {
+    val pct = if (total > 0) sold.toFloat() / total else 0f
     Card(
         Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
@@ -122,11 +165,11 @@ private fun SalesCard(label: String, group: SalesGroup) {
             Text(label, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(Modifier.height(8.dp))
             Row {
-                Text("Sold ${group.sold}", color = MBPSuccess, fontSize = 13.sp,
+                Text("Sold $sold", color = MBPSuccess, fontSize = 13.sp,
                     modifier = Modifier.weight(1f))
-                Text("Available ${group.available}", color = MBPGold, fontSize = 13.sp)
+                Text("Available $unsold", color = MBPGold, fontSize = 13.sp)
                 Spacer(Modifier.padding(horizontal = 6.dp))
-                Text("Total ${group.total}", color = MBPGray, fontSize = 13.sp)
+                Text("Total $total", color = MBPGray, fontSize = 13.sp)
             }
             Spacer(Modifier.height(10.dp))
             LinearProgressIndicator(
@@ -155,18 +198,34 @@ private fun StatusContent(report: StatusReportResponse?) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { Text("Villas", color = Color.White, fontWeight = FontWeight.SemiBold) }
-        items(report.villas) { b -> StatusBucketCard(b, report.villas.sumOf { it.count }) }
-        item { Spacer(Modifier.height(8.dp)) }
-        item { Text("Tower Units", color = Color.White, fontWeight = FontWeight.SemiBold) }
-        items(report.towerUnits) { b -> StatusBucketCard(b, report.towerUnits.sumOf { it.count }) }
+        if (report.villas.isNotEmpty()) {
+            item(key = "h_villas") {
+                Text("Villas", color = Color.White, fontWeight = FontWeight.SemiBold)
+            }
+            val total = report.villas.sumOf { it.total }
+            items(report.villas, key = { "vsr_${it.statusName}" }) {
+                StatusRowCard(it.statusName, it.total, total)
+            }
+        }
+        if (report.towers.isNotEmpty()) {
+            item(key = "h_towers") {
+                Spacer(Modifier.height(8.dp))
+                Text("Towers", color = Color.White, fontWeight = FontWeight.SemiBold)
+            }
+            val total = report.towers.sumOf { it.total }
+            items(report.towers, key = { "tsr_${it.statusName}" }) {
+                StatusRowCard(it.statusName, it.total, total)
+            }
+        }
+        if (report.villas.isEmpty() && report.towers.isEmpty()) {
+            item { Text("No data", color = MBPGray) }
+        }
     }
 }
 
 @Composable
-private fun StatusBucketCard(bucket: StatusBucket, total: Int) {
-    val color = parseColor(bucket.status?.colorCode) ?: MBPGold
-    val pct = if (total > 0) bucket.count.toFloat() / total else 0f
+private fun StatusRowCard(name: String?, count: Int, total: Int) {
+    val pct = if (total > 0) count.toFloat() / total else 0f
     Card(
         Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -175,12 +234,12 @@ private fun StatusBucketCard(bucket: StatusBucket, total: Int) {
         Column(Modifier.padding(14.dp)) {
             Row {
                 Text(
-                    bucket.status?.name ?: "—",
+                    name ?: "—",
                     color = Color.White,
                     fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
-                Text(bucket.count.toString(), color = color, fontWeight = FontWeight.Bold)
+                Text(count.toString(), color = MBPGold, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(8.dp))
             LinearProgressIndicator(
@@ -189,7 +248,7 @@ private fun StatusBucketCard(bucket: StatusBucket, total: Int) {
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = color,
+                color = MBPGold,
                 trackColor = MBPDark,
             )
         }

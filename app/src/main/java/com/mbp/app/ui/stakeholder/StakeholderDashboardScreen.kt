@@ -93,23 +93,19 @@ fun StakeholderDashboardScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        KpiCard("Total Villas", s.villas.total.toString(),
+                        KpiCard("Total Villas", s.totalVillas.toString(),
                             Icons.Filled.HomeWork, MBPGold, Modifier.weight(1f))
-                        KpiCard("Total Towers", s.towerUnits.total.toString(),
+                        KpiCard("Total Tower Units", s.totalTowerUnits.toString(),
                             Icons.Filled.Apartment, MBPBlue, Modifier.weight(1f))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        KpiCard("Villas Sold", s.villas.sold.toString(),
+                        KpiCard("Villas Sold", s.villasSold.toString(),
                             Icons.Filled.Sell, MBPSuccess, Modifier.weight(1f))
-                        KpiCard("Units Sold", s.towerUnits.sold.toString(),
+                        KpiCard("Units Sold", s.towerUnitsSold.toString(),
                             Icons.Filled.Sell, MBPSuccess, Modifier.weight(1f))
                     }
-                    s.villas.avgCompletion?.let {
-                        AvgCard("Avg Villa Completion", it, MBPGold)
-                    }
-                    s.towerUnits.avgCompletion?.let {
-                        AvgCard("Avg Unit Completion", it, MBPBlue)
-                    }
+                    AvgCard("Villas Sold %", s.villasSoldPct, MBPGold)
+                    AvgCard("Tower Units Sold %", s.towerUnitsSoldPct, MBPBlue)
                 }
             }
         }

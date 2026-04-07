@@ -144,43 +144,62 @@ data class StageDto(val id: Int, val name: String, val order: Int? = null)
 
 @JsonClass(generateAdapter = true)
 data class DashboardStatsResponse(
-    val villas: UnitStats,
-    @Json(name = "tower_units") val towerUnits: UnitStats,
-    val customers: CustomerStats? = null,
+    @Json(name = "total_villas") val totalVillas: Int = 0,
+    @Json(name = "total_tower_units") val totalTowerUnits: Int = 0,
+    @Json(name = "villas_sold") val villasSold: Int = 0,
+    @Json(name = "tower_units_sold") val towerUnitsSold: Int = 0,
+    @Json(name = "villas_sold_pct") val villasSoldPct: Double = 0.0,
+    @Json(name = "tower_units_sold_pct") val towerUnitsSoldPct: Double = 0.0,
+    @Json(name = "total_villa_tasks") val totalVillaTasks: Int = 0,
+    @Json(name = "total_tower_tasks") val totalTowerTasks: Int = 0,
 )
-
-@JsonClass(generateAdapter = true)
-data class UnitStats(
-    val total: Int = 0,
-    val sold: Int = 0,
-    val available: Int = 0,
-    @Json(name = "avg_completion") val avgCompletion: Double? = null,
-)
-
-@JsonClass(generateAdapter = true)
-data class CustomerStats(val total: Int = 0)
 
 @JsonClass(generateAdapter = true)
 data class SalesSummaryResponse(
-    val villas: SalesGroup,
-    @Json(name = "tower_units") val towerUnits: SalesGroup
+    val villas: List<VillaSalesRow> = emptyList(),
+    val towers: List<TowerSalesRow> = emptyList(),
 )
 
 @JsonClass(generateAdapter = true)
-data class SalesGroup(
+data class VillaSalesRow(
+    @Json(name = "villa_type_id") val villaTypeId: Int? = null,
+    @Json(name = "villa_type_name") val villaTypeName: String? = null,
+    @Json(name = "total_sold") val totalSold: Int = 0,
+    @Json(name = "total_unsold") val totalUnsold: Int = 0,
     val total: Int = 0,
-    val sold: Int = 0,
-    val available: Int = 0,
+)
+
+@JsonClass(generateAdapter = true)
+data class TowerSalesRow(
+    @Json(name = "tower_definition_id") val towerDefinitionId: Int? = null,
+    @Json(name = "tower_name") val towerName: String? = null,
+    @Json(name = "total_sold") val totalSold: Int = 0,
+    @Json(name = "total_unsold") val totalUnsold: Int = 0,
+    val total: Int = 0,
 )
 
 @JsonClass(generateAdapter = true)
 data class StatusReportResponse(
-    val villas: List<StatusBucket> = emptyList(),
-    @Json(name = "tower_units") val towerUnits: List<StatusBucket> = emptyList(),
+    val villas: List<VillaStatusRow> = emptyList(),
+    val towers: List<TowerStatusRow> = emptyList(),
 )
 
 @JsonClass(generateAdapter = true)
-data class StatusBucket(
-    val status: StatusDto? = null,
-    val count: Int = 0,
+data class VillaStatusRow(
+    @Json(name = "status_name") val statusName: String? = null,
+    @Json(name = "type_a_count") val typeACount: Int = 0,
+    @Json(name = "type_b_count") val typeBCount: Int = 0,
+    val total: Int = 0,
+)
+
+@JsonClass(generateAdapter = true)
+data class TowerStatusRow(
+    @Json(name = "status_name") val statusName: String? = null,
+    @Json(name = "tower_1") val tower1: Int = 0,
+    @Json(name = "tower_2") val tower2: Int = 0,
+    @Json(name = "tower_3") val tower3: Int = 0,
+    @Json(name = "tower_4") val tower4: Int = 0,
+    @Json(name = "tower_5") val tower5: Int = 0,
+    @Json(name = "tower_6") val tower6: Int = 0,
+    val total: Int = 0,
 )
