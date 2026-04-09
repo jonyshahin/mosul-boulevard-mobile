@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Release signing keystore — never commit
+app/mbp-release.keystore
+*.keystore
+*.jks
