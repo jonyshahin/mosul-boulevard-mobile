@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mbp.app"
+        applicationId = "com.mpciraq.mosulboulevard"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
